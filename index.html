@@ -25,287 +25,396 @@
 	</head>
 
 	<body>
-		<div class="container">
-			<h1 class="display-1">TCF's UTM Builder</h1>
-			<p class="lead">
-				Here's a simple utility to help generate UTM links en masse.
-			</p>
-
-			<form
-				class="
-					container
-					bg-light
-					border
-					rounded-3
-					shadow
-					p-3
-					mb-5
-					p-5
-					needs-validation
-				"
-				id="utm_form"
-				novalidate
-			>
-				<h3>URL details</h3>
-				<div class="row mb-3 form-section">
-					<label
-						for="utm_url_input"
-						class="col-md-3 col-form-label-lg"
-						>URL
-						<small class="text-muted form-text"
-							>(required)</small
-						></label
-					>
-					<div class="col-md-9 mb-3">
-						<input
-							id="utm_url_input"
-							type="text"
-							class="form-control form-control-lg utm_param"
-							required
-							aria-required="true"
-						/>
-						<small class="text-muted form-text"
-							>Enter the full URL, (e.g.
-							<code>https://tcf.org.pk/donate/</code>)
-						</small>
-					</div>
-					<div class="btn-group" role="group" aria-label="Sites">
-						<input
-							type="checkbox"
-							class="btn-check sites"
-							id="site_pk"
-							value="https://tcf.org.pk"
-							autocomplete="off"
-						/>
-						<label class="btn btn-outline-primary" for="site_pk"
-							>tcf.org.pk</label
-						>
-
-						<input
-							type="checkbox"
-							class="btn-check sites"
-							id="site_uk"
-							value="https://tcf-uk.org"
-							autocomplete="off"
-						/>
-						<label class="btn btn-outline-primary" for="site_uk"
-							>tcf-uk.org</label
-						>
-
-						<input
-							type="checkbox"
-							class="btn-check sites"
-							id="site_us"
-							value="https://tcfusa.org"
-							autocomplete="off"
-						/>
-						<label class="btn btn-outline-primary" for="site_us"
-							>tcfusa.org</label
-						>
-
-						<input
-							type="checkbox"
-							class="btn-check sites"
-							id="site_ca"
-							value="https://tcfcanada.org"
-							autocomplete="off"
-						/>
-						<label class="btn btn-outline-primary" for="site_ca"
-							>tcfcanada.org</label
-						>
-
-						<input
-							type="checkbox"
-							class="btn-check sites"
-							id="site_au"
-							value="https://tcfaustralia.org"
-							autocomplete="off"
-						/>
-						<label class="btn btn-outline-primary" for="site_au"
-							>tcfaustralia.org</label
-						>
-					</div>
-				</div>
-
-				<hr class="my-4" />
-
-				<div class="row mb-3 utm_parameters form-section">
-					<h3>UTM Parameters</h3>
-
-					<div class="row mb-3">
-						<label for="utm_source" class="col-md-3 col-form-label">
-							source <span class="text-muted">(required)</span>
-						</label>
-						<div class="col-md-9">
-							<input
-								class="form-control utm_param"
-								list="utm_sourceOptions"
-								id="utm_source"
-								placeholder="Type to search..."
-								required
-								aria-required="true"
-							/>
-							<small class="text-muted form-text"
-								>The referrer: (e.g. <code>google</code>,
-								<code>facebook</code>,
-								<code>newsletter</code>)</small
-							>
-							<datalist id="utm_sourceOptions">
-								<option value="facebook"></option>
-								<option value="twitter"></option>
-								<option value="instagram"></option>
-								<option value="linkedin"></option>
-								<option value="youtube"></option>
-								<option value="newsletter"></option>
-								<option value="whatsapp"></option>
-							</datalist>
-						</div>
-					</div>
-
-					<div class="row mb-3">
-						<label for="utm_medium" class="col-md-3 col-form-label">
-							medium
-						</label>
-						<div class="col-md-9">
-							<input
-								class="form-control utm_param"
-								list="utm_mediumOptions"
-								id="utm_medium"
-								placeholder="Type to search..."
-							/>
-							<small class="text-muted form-text"
-								>Marketing medium: (e.g. <code>cpc</code>,
-								<code>social</code>, <code>email</code>)</small
-							>
-							<datalist id="utm_mediumOptions">
-								<option value="social"></option>
-								<option value="email"></option>
-								<option value="referral"></option>
-								<option value="pr"></option>
-								<option value="display"></option>
-								<option value="cpc"></option>
-							</datalist>
-						</div>
-					</div>
-
-					<div class="row mb-3">
-						<label
-							for="utm_campaign"
-							class="col-md-3 col-form-label"
-							>utm_campaign</label
-						>
-						<div class="col-md-9">
-							<input
-								id="utm_campaign"
-								type="text"
-								class="form-control form-control utm_param"
-							/>
-							<small class="text-muted form-text"
-								>Campaign, initiative, or slogan: (e.g.
-								<code>ramzan2021</code>, <code>members</code>,
-								<code>expiry</code>)</small
-							>
-						</div>
-					</div>
-					<div class="row">
-						<label for="utm_content" class="col-md-3 col-form-label"
-							>utm_content</label
-						>
-						<div class="col-md-9">
-							<input
-								id="utm_content"
-								type="text"
-								class="form-control form-control utm_param"
-							/>
-							<small class="text-muted form-text"
-								>To differentiate ads or posts (e.g.
-								<code>membership-launch</code>,
-								<code>dvc30s</code>)</small
-							>
-						</div>
-					</div>
-				</div>
-
-				<div class="row mb-3 settings form-section">
-					<div class="col-md-9 offset-3">
-						<div class="form-check form-switch">
-							<input
-								class="form-check-input"
-								type="checkbox"
-								role="switch"
-								id="create_shortlink"
-							/>
+		<div class="container my-5">
+			<div class="p-5 g-1">
+				<h1 class="display-1">TCF's UTM Builder</h1>
+				<p class="lead">
+					Here's a simple utility to help generate UTM links en masse.
+				</p>
+				<form action="#0" class="needs-validation form-floating" id="utm_form">
+					<h3>URL details</h3>
+					<div class="row mb-3 url form-section">
+						<div class="row mb-3">
 							<label
-								class="form-check-label"
-								for="create_shortlink"
-								>Generate short URL(s)</label
+								for="utm_url_input"
+								class="col-md-3 col-form-label-lg"
+								>URL
+								<small class="text-muted form-text"
+									>(required)</small
+								></label
 							>
+							<div class="col-md-9 mb-3">
+								<input
+									id="utm_url_input"
+									type="url"
+									list="tcf_urls"
+									pattern="https://.*"
+									class="form-control form-control-lg utm_param"
+									required
+									autofocus
+									aria-required="true"
+									title="Please enter a valid URL, e.g. https://tcf.org.pk/donate"
+								/>
+								<small class="text-muted form-text"
+									>Enter the full URL, (e.g.
+									<code>https://tcf.org.pk/donate/</code>)
+								</small>
+								
+								<datalist id="tcf_urls">
+									<option value="https://tcf.org.pk"></option>
+									<option value="http://tcf-uk.org"></option>
+									<option value="http://tcfusa.org"></option>
+									<option value="https://tcfcanada.org"></option>
+									<option value="http://tcfaustralia.org"></option>
+									<option value="http://tcfnorway.org"></option>
+								</datalist>
+							</div>
+						</div>
+						<div class="row">
+							<div class="selected_sites col-md-9 offset-md-3" role="group" aria-label="Sites">
+								<input
+									type="checkbox"
+									class="btn-check sites"
+									id="site_pk"
+									value="https://tcf.org.pk"
+									checked
+								/>
+								<label class="btn btn-outline-primary" for="site_pk"
+									>tcf.org.pk</label
+								>
+								<input
+									type="checkbox"
+									class="btn-check sites"
+									id="site_uk"
+									value="https://tcf-uk.org"
+								/>
+								<label class="btn btn-outline-primary" for="site_uk"
+									>tcf-uk.org</label
+								>
+								<input
+									type="checkbox"
+									class="btn-check sites"
+									id="site_us"
+									value="https://tcfusa.org"
+								/>
+								<label class="btn btn-outline-primary" for="site_us"
+									>tcfusa.org</label
+								>
+								<input
+									type="checkbox"
+									class="btn-check sites"
+									id="site_ca"
+									value="https://tcfcanada.org"
+								/>
+								<label class="btn btn-outline-primary" for="site_ca"
+									>tcfcanada.org</label
+								>
+								<input
+									type="checkbox"
+									class="btn-check sites"
+									id="site_au"
+									value="https://tcfaustralia.org"
+								/>
+								<label class="btn btn-outline-primary" for="site_au"
+									>tcfaustralia.org</label
+								>
+								<div class="row">
+									<small class="text-muted form-text"
+										>Select the sites for which you want to generate UTM parameters</code>
+									</small>
+								</div>
+							</div>
 						</div>
 					</div>
-				</div>
+					<div class="row utm_settings form-section">
+						<div class="col-md-9 offset-md-3">
+							<div class="form-check form-switch">
+								<input
+									class="form-check-input"
+									type="checkbox"
+									role="switch"
+									id="create_shortlink"
+								/>
+								<label
+									class="form-check-label"
+									for="create_shortlink"
+									>Generate short URL(s)</label
+								>
+							</div>
+						</div>
+					</div>
 
-				<hr class="my-4" />
+					<hr class="my-4" />
+					<div class="row mb-3 utm_parameters form-section">
+						<h3>UTM Parameters</h3>
 
-				<div class="row mb-3 form-section">
+						<div class="row mb-3">
+							<div class="row mb-3">
+								<label
+									for="utm_campaign"
+									class="col-md-3 col-form-label"
+									>utm_campaign</label
+								>
+								<div class="col-md-9">
+									<input
+										id="utm_campaign"
+										type="text"
+										class="form-control form-control utm_param"
+										pattern="[a-z][A-z-\d\s]+"
+									/>
+									<small class="text-muted form-text"
+										>A cross-channel description of the campaign or marketing initiative: (e.g.
+										<code>ramzan2021</code>,
+										<code>members</code>,
+										<code>expiry</code>)</small
+									>
+								</div>
+							</div>
+							<div class="row mb-3">
+								<label
+									for="utm_content"
+									class="col-md-3 col-form-label"
+									>utm_content</label
+								>
+								<div class="col-md-9">
+									<input
+										id="utm_content"
+										type="text"
+										class="form-control form-control utm_param"
+										pattern="[a-z][A-z-\d\s]+"
+									/>
+									<small class="text-muted form-text"
+										>To differentiate ads or posts (e.g.
+										<code>membership-launch</code>,
+										<code>dvc30s</code>)</small
+									>
+								</div>
+							</div>
+							<div class="row mb-3">
+								<label
+									for="utm_term"
+									class="col-md-3 col-form-label"
+									>utm_term <span class="text-muted">(optional)</span></label
+								>
+								<div class="col-md-9">
+									<input
+										id="utm_term"
+										type="text"
+										class="form-control form-control utm_param"
+										pattern="[a-z][A-z-\d\s]+"
+									/>
+									<small class="text-muted form-text"
+										>Used for paid search, to identify the keywords for this ad. (e.g.
+										<code>donate for education</code>,
+										<code>zakat calculator</code>)</small
+									>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-3">
+									<label
+										for="utm_content"
+										class="col-form-label"
+										>Common presets</label
+									>
+								</div>
+								<div class="col-md-9">
+									<div class="selected_sources" role="group" aria-label="Sites">
+										<input
+											type="checkbox"
+											class="btn-check sources"
+											id="utm_facebook"
+											value="utm_facebook"
+											checked
+										/>
+										<label class="btn btn-outline-primary" for="utm_facebook"
+											>Facebook</label
+										>
+										<input
+											type="checkbox"
+											class="btn-check sources"
+											id="utm_twitter"
+											value="utm_twitter"
+										/>
+										<label class="btn btn-outline-primary" for="utm_twitter"
+											>Twitter</label
+										>
+										<input
+											type="checkbox"
+											class="btn-check sources"
+											id="utm_linkedin"
+											value="utm_linkedin"
+										/>
+										<label class="btn btn-outline-primary" for="utm_linkedin"
+											>LinkedIn</label
+										>
+										<input
+											type="checkbox"
+											class="btn-check sources"
+											id="utm_email"
+											value="utm_email"
+										/>
+										<label class="btn btn-outline-primary" for="utm_email"
+											>Email</label
+										>
+										<input
+											type="checkbox"
+											class="btn-check sources"
+											id="utm_whatsapp"
+											value="utm_whatsapp"
+										/>
+										<label class="btn btn-outline-primary" for="utm_whatsapp"
+											>WhatsApp</label
+										>
+										<input
+											type="checkbox"
+											class="btn-check sources"
+											id="utm_custom"
+											value="utm_custom"
+											data-bs-toggle="collapse"
+											data-bs-target="#utm_custom_params"
+											aria-expanded="false"
+											aria-controls="utm_custom_params"
+										/>
+										<label class="btn btn-outline-primary" for="utm_custom"
+											>Custom</label
+										>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="row collapse mt-3 p-3 bg-light border" id="utm_custom_params">
+							<div class="row mb-3">
+								<label
+									for="utm_source"
+									class="col-md-3 col-form-label"
+								>
+									utm_source
+									<span class="text-muted">(required)</span>
+								</label>
+								<div class="col-md-9">
+									<input
+										class="form-control utm_param"
+										list="utm_sourceOptions"
+										id="utm_source"
+										type="text"
+										placeholder="Type to search suggested sources..."
+										required
+										aria-required="true"
+										pattern="[a-z]+"
+									/>
+									<small class="text-muted form-text"
+										>The source of traffic: (e.g. <code>google</code>,
+										<code>facebook</code>,
+										<code>newsletter</code>,
+										<code>whatsapp</code>)</small
+									>
+									<datalist id="utm_sourceOptions">
+										<option value="facebook"></option>
+										<option value="twitter"></option>
+										<option value="instagram"></option>
+										<option value="linkedin"></option>
+										<option value="youtube"></option>
+										<option value="newsletter"></option>
+										<option value="whatsapp"></option>
+									</datalist>
+								</div>
+							</div>
+							<div class="row mb-3">
+								<label
+									for="utm_medium"
+									class="col-md-3 col-form-label"
+								>
+									utm_medium
+								</label>
+								<div class="col-md-9">
+									<input
+										class="form-control utm_param"
+										list="utm_mediumOptions"
+										id="utm_medium"
+										type="text"
+										placeholder="Type to search suggested media..."
+										pattern="[a-z]+"
+									/>
+									<small class="text-muted form-text"
+										>Marketing medium or channels: (e.g. <code>cpc</code>,
+										<code>social</code>,
+										<code>email</code>,
+										<code>referral</code>)</small
+									>
+									<datalist id="utm_mediumOptions">
+										<option value="social"></option>
+										<option value="email"></option>
+										<option value="referral"></option>
+										<option value="pr"></option>
+										<option value="display"></option>
+										<option value="cpc"></option>
+									</datalist>
+								</div>
+							</div>
+						</div>
+					</div>
+					<hr class="my-4" />
+					<div class="row submit form-section">
+						<div class="row">
+							<div class="col-auto offset-md-3">
+								<button
+									type="submit"
+									class="btn btn-primary btn-lg"
+									id="generate_url"
+									aria-label="Generate URL"
+								>
+									<i class="bi-magic"></i> Generate
+								</button>
+							</div>
+							<!-- <div class="col-auto ms-auto">
+								<button
+									type="button"
+									class="btn btn-link"
+									id="clear_form"
+									aria-label="Clear form"
+								>
+									<i class="bi-x"></i>Clear
+								</button>
+							</div> -->
+						</div>
+					</div>
+					<hr class="my-4" />
+				</form>
+			</div>
+			<div class="display bg-light border my-2 p-5">
+				<div class="row">
+					<h2 class="display-6">Generated UTM links</h2>
+					
+					<!--
 					<div class="row">
-						<div class="col-auto offset-3">
+						<div class="col-md-9">
 							<button
-								type="submit"
-								class="btn btn-primary btn-lg"
-								id="generate_url"
-								aria-label="Generate URL"
-							>
-								<i class="bi-magic"></i> Generate
-							</button>
-						</div>
-						<div class="col-auto ms-auto">
-							<button
+								class="btn btn-outline-secondary"
 								type="button"
-								class="btn btn-link"
-								id="clear_form"
-								aria-label="Clear form"
+								id="btn_copy"
+								data-clipboard-action="copy"
+								data-clipboard-target="#utm_url_display"
+								aria-label="Copy generated URL"
 							>
-								<i class="bi-x"></i>Clear
+								<i class="bi-clipboard-plus"></i> Copy
 							</button>
 						</div>
 					</div>
-				</div>
+					-->
 
-				<hr class="my-4" />
-
-				<div class="row mb-3 form-section">
-					<label for="utm_url_display" class="col-md-3 col-form-label"
-						>UTM Link</label
-					>
-					<div class="col-md-9">
-						<pre
-							id="utm_url_display"
-							class="
-								form-control
-								user-select-all
-								overflow-auto
-								mw-100
-								text-light
-								bg-dark
-							"
-						></pre>
-
-						<button
-							class="btn btn-outline-secondary"
-							type="button"
-							id="btn_copy"
-							data-clipboard-action="copy"
-							data-clipboard-target="#utm_url_display"
-							aria-label="Copy generated URL"
-						>
-							<i class="bi-clipboard-plus"></i> Copy
-						</button>
+					<div id="utm_table_container" class="container ">
+						<p>Click <code>Generate</code> above to build a list of URLs.
+						</p>
 					</div>
+					
 				</div>
-			</form>
+			</div>
 		</div>
 
 		<script src="https://code.jquery.com/jquery-3.6.0.slim.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
 		<script src="/js/main.js"></script>
 	</body>
