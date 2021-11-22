@@ -190,7 +190,7 @@ $(document).ready(function () {
 			// create thead
 			site_table
 				.append(
-					'<caption>Links for <span class="utm_url"></span></caption><thead class="table-dark"><tr><th scope="col" class="mw-25">Source</th><th scope="col" class="mw-75">UTM link</th></tr></thead>'
+					'<caption>Links for <span class="utm_url"></span></caption><thead class="table-dark"><tr><th scope="col" class="col-md-2">Source</th><th scope="col" class="col-md-10">UTM link</th></tr></thead>'
 				)
 				.before(`<h3 id="${site_html_id}_title">${site.hostname}</h3>`)
 				.after("<hr class='my-4' />")
@@ -213,7 +213,7 @@ $(document).ready(function () {
 				
 				// create tbody
 				site_table.append(
-					`<tbody><tr><th scope="row"><i class="bi ${values.icon} me-1 d-block"></i>${values.utm_source}</th><td><div class="input-group"><pre id="${preId}" class="user-select-all border p-2 utm_display overflow-scroll text-dark bg-body"><code></code></pre></div></td></tr></tbody>`
+					`<tbody><tr><th scope="row"><i class="bi ${values.icon} me-1" title="${source}"></i>${values.utm_source}</th><td><div class="input-group"><pre id="${preId}" class="user-select-all border p-2 utm_display overflow-scroll w-100 text-dark bg-body"><code></code></pre></div></td></tr></tbody>`
 					);
 				
 				site[source].searchParams.delete('icon');
