@@ -9,6 +9,7 @@
 		<meta property="og:title" content="Bulk UTM Builder" />
 		<meta property="og:type" content="website" />
 		<meta property="og:image" content="" />
+		<link rel="icon" href="favicon.png">
 
 		<link
 			href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
@@ -24,13 +25,13 @@
 	</head>
 
 	<body>
-		<div class="container my-5">
-			<div class="p-5 g-1">
+		<div class="container-md my-5">
+			<div class="p-md-5 p-3">
 				<h1 class="display-1">TCF's UTM Builder</h1>
 				<p class="lead">
 					Here's a simple utility to help generate UTM links en masse.
 				</p>
-				<form action="#0" class="needs-validation form-floating" id="utm_form">
+				<form class="needs-validation" id="utm_form">
 					<h3>URL details</h3>
 					<div class="row mb-3 url form-section">
 						<div class="row mb-3">
@@ -61,11 +62,11 @@
 								
 								<datalist id="tcf_urls">
 									<option value="https://tcf.org.pk"></option>
-									<option value="http://tcf-uk.org"></option>
-									<option value="http://tcfusa.org"></option>
+									<option value="https://tcf-uk.org"></option>
+									<option value="https://tcfusa.org"></option>
 									<option value="https://tcfcanada.org"></option>
-									<option value="http://tcfaustralia.org"></option>
-									<option value="http://tcfnorway.org"></option>
+									<option value="https://tcfaustralia.org"></option>
+									<option value="https://tcfnorway.org"></option>
 								</datalist>
 							</div>
 						</div>
@@ -250,6 +251,15 @@
 										<input
 											type="checkbox"
 											class="btn-check sources"
+											id="utm_instagram"
+											value="utm_instagram"
+										/>
+										<label class="btn btn-outline-primary" for="utm_instagram"
+											>Instagram</label
+										>
+										<input
+											type="checkbox"
+											class="btn-check sources"
 											id="utm_email"
 											value="utm_email"
 										/>
@@ -299,7 +309,7 @@
 										id="utm_source"
 										type="text"
 										placeholder="Type to search suggested sources..."
-										required
+										
 										aria-required="true"
 										pattern="[a-z]+"
 									/>
@@ -382,7 +392,7 @@
 					<hr class="my-4" />
 				</form>
 			</div>
-			<div class="display bg-light border my-2 p-5">
+			<div class="display bg-light border my-2 p-md-5 p-3">
 				<div class="row">
 					<h2 class="display-6">Generated UTM links</h2>
 					
@@ -403,7 +413,7 @@
 					</div>
 					-->
 
-					<div id="utm_table_container" class="container ">
+					<div id="utm_table_container" class="container">
 						<p>Click <code>Generate</code> above to build a list of URLs.
 						</p>
 					</div>

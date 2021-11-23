@@ -2,28 +2,77 @@ $(document).ready(function () {
 	const btn_clear = $("#clear_form"),
 		btn_generate = $("#generate_url"),
 		utm_url = $("#utm_url"),
-		utm_form = $("form#utm_form"),
-		utm_url_display = $(".utm_display");
+		utm_custom_params = $("#utm_custom_params"),
+		utm_source = $("#utm_source"),
+		utm_medium = $("#utm_medium"),
+		utm_campaign = $("#utm_campaign"),
+		utm_content = $("#utm_content"),
+		utm_form = $("form#utm_form");
 
-	// btn_copy.hide();
+	btn_generate.on("click", function (e) {
+		try {
+			e.preventDefault();
 
-	btn_generate.click(function (e) {
-		e.preventDefault();
+			// clear previous
+			$("#utm_table_container").html(
+				"<p>Click <code>Generate</code> above to build a list of URLs.</p>"
+			);
 
-		// can't use jQuery obj for reportValidity
-		document.querySelector("#utm_form").reportValidity();
+			// can't use jQuery obj for reportValidity
+			if (!document.querySelector("#utm_form").reportValidity()) {
+				e.stopPropagation();
+				throw new TypeError("invalid input");
+			}
 
-		// clear previous
-		utm_url_display.text("");
+			utm_form.addClass("was-validated");
+			console.log("valid input");
 
-		let url = $("#utm_url_input").val().trim();
-		create_utm(url, get_params(), get_selected_sites());
+			let url = $("#utm_url_input").val().trim();
+
+			// make url a URL obj
+			url = new URL(url);
+
+			// always ensure https://
+			url.protocol = "https:";
+
+			// select site based on entered url
+			$(`input.sites[value="${url.origin}"]`).attr("checked", true);
+
+			// @FIXME: if UTMs already in the url, use them (?)
+			if (url.searchParams !== undefined) {
+				if (url.searchParams.get("utm_campaign")) {
+					utm_campaign.val(url.searchParams.get("utm_campaign"));
+				}
+				if (url.searchParams.get("utm_content")) {
+					utm_content.val(url.searchParams.get("utm_content"));
+				}
+				if (url.searchParams.get("utm_source")) {
+					utm_source.val(url.searchParams.get("utm_source"));
+				}
+				if (url.searchParams.get("utm_medium")) {
+					utm_medium.val(url.searchParams.get("utm_medium"));
+				}
+			}
+
+			create_utm(url, get_params(), get_selected_sites());
+		} catch (e) {
+			console.log(e);
+		}
 	});
 
 	btn_clear.click(function () {
 		utm_form.trigger("reset");
 		utm_url_display.text("");
 		btn_copy.hide();
+	});
+
+	// set utm_source to required if custom is shown
+	utm_custom_params.on("shown.bs.collapse", function () {
+		utm_source.attr("required", true);
+	});
+
+	utm_custom_params.on("hidden.bs.collapse", function () {
+		utm_source.attr("required", false);
 	});
 
 	/*
@@ -67,6 +116,12 @@ $(document).ready(function () {
 			selected_sources["utm_facebook"]["icon"] = "bi-facebook";
 		}
 
+		if ("utm_instagram" in selected_sources) {
+			selected_sources["utm_instagram"]["utm_medium"] = "social";
+			selected_sources["utm_instagram"]["utm_source"] = "instagram";
+			selected_sources["utm_instagram"]["icon"] = "bi-instagram";
+		}
+
 		if ("utm_twitter" in selected_sources) {
 			selected_sources["utm_twitter"]["utm_medium"] = "social";
 			selected_sources["utm_twitter"]["utm_source"] = "twitter";
@@ -93,12 +148,13 @@ $(document).ready(function () {
 
 		// if also building custom params
 		if ("utm_custom" in selected_sources) {
-			selected_sources["utm_custom"]["utm_medium"] = clean_param(
-				$("#utm_medium")
-			);
-			selected_sources["utm_custom"]["utm_source"] = clean_param(
-				$("#utm_source")
-			);
+			let utm_medium = clean_param($("#utm_medium")),
+				utm_source = clean_param($("#utm_source"));
+
+			if (utm_medium !== "")
+				selected_sources["utm_custom"]["utm_medium"] = utm_medium;
+			if (utm_source !== "")
+				selected_sources["utm_custom"]["utm_source"] = utm_source;
 			selected_sources["utm_custom"]["icon"] = "bi-pencil-square";
 		}
 
@@ -115,22 +171,12 @@ $(document).ready(function () {
 				selected_sites[u.hostname] = u;
 			})
 			.get();
-			
-		// @TODO: if no sites selected set default from the url
 
 		return selected_sites;
 	}
 
 	function create_utm(url, params, selected_sites) {
 		try {
-			
-			// make url a URL obj
-			url = new URL(url);
-			
-			// always ensure https://
-			url.protocol = "https:";
-			
-
 			// utm_source is always required
 			if ("utm_custom" in params && params.utm_custom.source === "") {
 				throw new ReferenceError("custom utm_source is required");
@@ -140,7 +186,10 @@ $(document).ready(function () {
 			Object.assign(utms, selected_sites);
 
 			// get each selected_site
-			for (let [selected_sites_key, selected_sites_value] of Object.entries(utms)) {
+			for (let [
+				selected_sites_key,
+				selected_sites_value,
+			] of Object.entries(utms)) {
 				// set entered pathname on each selected site
 				selected_sites_value.pathname = url.pathname;
 				selected_sites_value.hash = url.hash;
@@ -153,10 +202,9 @@ $(document).ready(function () {
 						selected_sites_value.origin
 					);
 
-					// delete(params_value['icon']);
-
 					// create URLSearchParams of each param
-					utms[selected_sites_key][params_key].search = new URLSearchParams(params_value);
+					utms[selected_sites_key][params_key].search =
+						new URLSearchParams(params_value);
 					utms[selected_sites_key][params_key].hash = url.hash;
 
 					// console.log(utms[selected_sites_key][params_key].href);
@@ -165,7 +213,7 @@ $(document).ready(function () {
 
 			display_utms(utms, params);
 		} catch (e) {
-			console.log("Error on line " + e.lineNumber + ": " + e.message);
+			console.log(e);
 		}
 	}
 
@@ -179,8 +227,8 @@ $(document).ready(function () {
 			let site_html_id = site.hostname.replace(/\./g, "_"),
 				site_table = $("<table>")
 					.attr({
-						"id": site_html_id,
-						"aria-labelledby": site_html_id + "_title"
+						id: site_html_id,
+						"aria-labelledby": site_html_id + "_title",
 					})
 					.addClass(
 						"table table-responsive table-hover caption-top align-middle mb-4 mw-100"
@@ -192,8 +240,9 @@ $(document).ready(function () {
 				.append(
 					'<caption>Links for <span class="utm_url"></span></caption><thead class="table-dark"><tr><th scope="col" class="col-md-2">Source</th><th scope="col" class="col-md-10">UTM link</th></tr></thead>'
 				)
-				.before(`<h3 id="${site_html_id}_title">${site.hostname}</h3>`)
-				.after("<hr class='my-4' />")
+				.before(
+					`<hr class='my-4' /><h3 id="${site_html_id}_title">${site.hostname}</h3>`
+				)
 				.find(".utm_url")
 				.html(
 					`<a href="${site.href}" target="_blank">${site.href} <i class="bi-box-arrow-up-right"></i></a>`
@@ -202,25 +251,54 @@ $(document).ready(function () {
 			for (let [source, values] of Object.entries(params)) {
 				// console.log(`Generating ${source} for ${site.href}`);
 
-				// @TODO: sort for readability
+				// @FIXME: sort for readability
 				site[source].searchParams.sort();
-				
+				site[source].searchParams.delete("icon");
+
 				// html friendly ID without .
 				// pre#tcf_org_pk_utm_facebook
 				let preId = `${site_html_id}_${source}`;
-				
-				// console.log(values[icon]);
-				
+
+				// validate generated URL
+				let validation = validate_utm(site[source]);
+
 				// create tbody
 				site_table.append(
-					`<tbody><tr><th scope="row"><i class="bi ${values.icon} me-1" title="${source}"></i>${values.utm_source}</th><td><div class="input-group"><pre id="${preId}" class="user-select-all border p-2 utm_display overflow-scroll w-100 text-dark bg-body"><code></code></pre></div></td></tr></tbody>`
-					);
-				
-				site[source].searchParams.delete('icon');
+					`<tbody><tr><th scope="row"><i class="bi ${values.icon} me-1" title="${source}"></i>${values.utm_source}</th><td><div class="input-group"><pre id="${preId}" class="user-select-all border p-2 utm_display overflow-scroll w-100 text-dark bg-body"><code></code></pre></div>${validation}</td></tr></tbody>`
+				);
 
 				// fill in generated UTM
 				$(`pre#${preId} > code`).text(site[source].href);
 			}
 		}
+	}
+
+	function validate_utm(url) {
+		let validate_message = [],
+			utm_source = url.searchParams.get("utm_source"),
+			utm_medium = url.searchParams.get("utm_medium"),
+			utm_campaign = url.searchParams.get("utm_campaign"),
+			utm_content = url.searchParams.get("utm_content");
+
+		if (utm_source === null) {
+			validate_message.push("<strong>utm_source</strong>");
+		}
+		if (utm_medium === null) {
+			validate_message.push("<strong>utm_medium</strong>");
+		}
+		if (utm_campaign === null) {
+			validate_message.push("<strong>utm_campaign</strong>");
+		}
+		if (utm_content === null) {
+			validate_message.push("<strong>utm_content</strong>");
+		}
+
+		if (validate_message.length) {
+			return `<div class="alert alert-warning d-flex align-items-top my-1" role="alert"><i class="bi bi-info-circle-fill me-3"></i><div>Consider adding ${validate_message.join(
+				", "
+			)}</div></div>`;
+		}
+
+		return "";
 	}
 });
