@@ -7,14 +7,15 @@ $(document).ready(function () {
 		utm_medium = $("#utm_medium"),
 		utm_campaign = $("#utm_campaign"),
 		utm_content = $("#utm_content"),
-		utm_form = $("form#utm_form");
+		utm_form = $("form#utm_form"),
+		utm_table_container = $("#utm_table_container");
 
 	btn_generate.on("click", function (e) {
 		try {
 			e.preventDefault();
 
 			// clear previous
-			$("#utm_table_container").html(
+			utm_table_container.html(
 				"<p>Click <code>Generate</code> above to build a list of URLs.</p>"
 			);
 
@@ -218,9 +219,6 @@ $(document).ready(function () {
 	}
 
 	function display_utms(utms, params) {
-		let utm_table_container = $("#utm_table_container"),
-			utm_table = $("#utm_table");
-
 		utm_table_container.html("");
 
 		for (let site of Object.values(utms)) {
@@ -231,14 +229,14 @@ $(document).ready(function () {
 						"aria-labelledby": site_html_id + "_title",
 					})
 					.addClass(
-						"table table-responsive table-hover caption-top align-middle mb-4 mw-100"
+						"table table-responsive table-hover caption-top align-top mb-4 mw-100"
 					)
 					.appendTo(utm_table_container);
 
 			// create thead
 			site_table
 				.append(
-					'<caption>Links for <span class="utm_url"></span></caption><thead class="table-dark"><tr><th scope="col" class="col-md-2">Source</th><th scope="col" class="col-md-10">UTM link</th></tr></thead>'
+					'<caption>Links for <span class="utm_url"></span></caption><thead class="table-dark"><tr><th scope="col" class="col-md-2">Source</th><th scope="col" class="col-md-8">UTM link</th><th scope="col" class="col-md-2">Short link</th></tr></thead>'
 				)
 				.before(
 					`<hr class='my-4' /><h3 id="${site_html_id}_title">${site.hostname}</h3>`
@@ -264,13 +262,67 @@ $(document).ready(function () {
 
 				// create tbody
 				site_table.append(
-					`<tbody><tr><th scope="row"><i class="bi ${values.icon} me-1" title="${source}"></i>${values.utm_source}</th><td><div class="input-group"><pre id="${preId}" class="user-select-all border p-2 utm_display overflow-scroll w-100 text-dark bg-body"><code></code></pre></div>${validation}</td></tr></tbody>`
+					`<tbody><tr><th scope="row" class="p-md-3"><i class="bi ${values.icon} me-1" title="${source}"></i>${values.utm_source}</th><td><pre id="${preId}" class="border p-2 utm_display overflow-scroll w-100 text-dark bg-body"><code class="user-select-all"></code></pre>${validation}</td><td><pre id="${preId}_shortlink" class="border p-2 shortlink_display overflow-scroll w-100 text-dark bg-body"><code class="user-select-all"></code></pre><div class="d-block my-1"><button type="submit" class="btn btn-secondary btn generate_shorlink" aria-label="Generate short link" data-for="${preId}"><i class="bi-link"></i> Get short link</button></div></td></tr></tbody>`
 				);
 
 				// fill in generated UTM
 				$(`pre#${preId} > code`).text(site[source].href);
 			}
 		}
+	}
+
+	utm_table_container.on("click", ".generate_shorlink", function (e) {
+		e.preventDefault();
+		shortenUrl(this);
+	});
+
+	function shortenUrl(btn) {
+		const config = {
+			token: process.env.BITLY_TOKEN, // Netlify env variable
+			group_guid: "",
+		};
+
+		let $btn = $(btn),
+			shortlink_for = $btn.attr("data-for"),
+			url_display = $(`pre#${shortlink_for} > code`),
+			url = new URL(url_display.text()),
+			dataObject = {
+				long_url: url,
+				domain: "bit.ly",
+				tags: ["bulk-utm-builder", "api"],
+				group_guid: config.group_guid,
+			};
+
+		$btn.find("i").addClass("bi-arrow-clockwise spin").removeClass("bi-link");
+
+		// @TODO: select group/domain based on domain
+		if (url.hostname == "tcf.org.pk") {
+			dataObject.domain = "link.tcf.org.pk";
+		}
+
+		fetch("https://api-ssl.bitly.com/v4/shorten", {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${config.token}`,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(dataObject),
+		})
+			.then((response) => {
+				$btn.find("i").removeClass("bi-arrow-clockwise spin").addClass("bi-link");
+
+				if (response.ok) {
+					return response.json();
+				} else {
+					return Promise.reject(response.status);
+				}
+			})
+			.then((json) => {
+				$(`pre#${shortlink_for}_shortlink code`).text(json.link);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	}
 
 	function validate_utm(url) {
