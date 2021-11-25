@@ -331,7 +331,7 @@ $(document).ready(function () {
 
 	function shortenUrl(btn) {
 		const config = {
-			token: process.env.BITLY_TOKEN, // Netlify env variable
+			token: BITLY_TOKEN, // Netlify env variable
 			group_guid: "",
 		};
 
