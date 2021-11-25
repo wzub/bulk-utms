@@ -110,6 +110,15 @@
 								<label class="btn btn-outline-primary" for="site_au"
 									>tcfaustralia.org</label
 								>
+								<input
+									type="checkbox"
+									class="btn-check sites"
+									id="site_no"
+									value="https://tcfnorway.org"
+								/>
+								<label class="btn btn-outline-primary" for="site_no"
+									>tcfnorway.org</label
+								>
 								<div class="row">
 									<small class="text-muted form-text"
 										>Select the sites for which you want to generate UTM parameters</code>
@@ -386,7 +395,19 @@
 			</div>
 			<div class="display bg-light border my-2 p-md-5 p-3">
 				<div class="row">
-					<h2 class="display-6">Generated UTM links</h2>
+					<div class="col-md-auto me-auto">
+						<h2 class="display-6 me-auto">Generated UTM links</h2>
+					</div>
+					<div class="col-md-auto d-flex align-items-center">
+						<button
+							type="submit"
+							class="btn btn-outline-secondary col-md-auto"
+							id="download_csv"
+							aria-label="Download CSV"
+						>
+							<i class="bi-download"></i> Download CSV
+						</button>
+					</div>
 					<!--
 					<div class="row">
 						<div class="col-md-9">

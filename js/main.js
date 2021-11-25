@@ -8,7 +8,10 @@ $(document).ready(function () {
 		utm_campaign = $("#utm_campaign"),
 		utm_content = $("#utm_content"),
 		utm_form = $("form#utm_form"),
-		utm_table_container = $("#utm_table_container");
+		utm_table_container = $("#utm_table_container"),
+		btn_download = $("#download_csv");
+
+	btn_download.hide();
 
 	btn_generate.on("click", function (e) {
 		try {
@@ -56,12 +59,13 @@ $(document).ready(function () {
 			}
 
 			create_utm(url, get_params(), get_selected_sites());
+			btn_download.show();
 		} catch (e) {
 			console.log(e);
 		}
 	});
 
-	btn_clear.click(function () {
+	btn_clear.on("click", function () {
 		utm_form.trigger("reset");
 		utm_url_display.text("");
 		btn_copy.hide();
@@ -75,6 +79,55 @@ $(document).ready(function () {
 	utm_custom_params.on("hidden.bs.collapse", function () {
 		utm_source.attr("required", false);
 	});
+
+	btn_download.on("click", function () {
+		let utm_table = $("table.utm_table");
+		download_table_as_csv(utm_table);
+	});
+
+	// @Calumah via https://stackoverflow.com/questions/15547198/export-html-table-to-csv-using-vanilla-javascript
+	function download_table_as_csv(table) {
+		let rows = table.find("tr"),
+			csv = [];
+
+		// loop through all tr
+		for (var i = 0; i < rows.length; i++) {
+			// for each row get source and links inside pre
+			let row = [],
+				cols = rows[i].querySelectorAll("th, td pre");
+
+			// loop through columns
+			for (var j = 0; j < cols.length; j++) {
+				// get and clean text of each th, td pre
+				// remove multiple spaces and jumpline (break csv)
+				// Escape double-quote with double-double-quote (see https://stackoverflow.com/questions/17808511/properly-escape-a-double-quote-in-csv)
+				let data = cols[j].innerText
+					.replace(/(\r\n|\n|\r)/gm, "")
+					.replace(/(\s\s)/gm, " ")
+					.replace(/"/g, '""');
+
+				row.push('"' + data + '"');
+			}
+			csv.push(row.join(","));
+		}
+
+		// convert csv to a set and back again to remove duplicate table headers
+		let csv_deduped = Array.from(new Set(csv)),
+			csv_string = csv_deduped.join("\n"),
+			filename = "utms_" + new Date().toLocaleDateString() + ".csv",
+			link = document.createElement("a");
+
+		link.style.display = "none";
+		link.setAttribute("target", "_blank");
+		link.setAttribute(
+			"href",
+			"data:text/csv;charset=utf-8," + encodeURIComponent(csv_string)
+		);
+		link.setAttribute("download", filename);
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
 
 	/*
 	copy.on("success", function () {
@@ -229,7 +282,7 @@ $(document).ready(function () {
 						"aria-labelledby": site_html_id + "_title",
 					})
 					.addClass(
-						"table table-responsive table-hover caption-top align-top mb-4 mw-100"
+						"table table-responsive table-hover caption-top align-top mb-4 mw-100 utm_table"
 					)
 					.appendTo(utm_table_container);
 
@@ -262,7 +315,7 @@ $(document).ready(function () {
 
 				// create tbody
 				site_table.append(
-					`<tbody><tr><th scope="row" class="p-md-3"><i class="bi ${values.icon} me-1" title="${source}"></i>${values.utm_source}</th><td><pre id="${preId}" class="border p-2 utm_display overflow-scroll w-100 text-dark bg-body"><code class="user-select-all"></code></pre>${validation}</td><td><pre id="${preId}_shortlink" class="border p-2 shortlink_display overflow-scroll w-100 text-dark bg-body"><code class="user-select-all"></code></pre><div class="d-block my-1"><button type="submit" class="btn btn-secondary btn generate_shorlink" aria-label="Generate short link" data-for="${preId}"><i class="bi-link"></i> Get short link</button></div></td></tr></tbody>`
+					`<tbody><tr><th scope="row" class="p-md-3"><i class="bi ${values.icon} me-1" title="${source}"></i>${values.utm_source}</th><td><pre id="${preId}" class="border p-2 utm_display overflow-scroll w-100 text-dark bg-body"><code class="user-select-all"></code></pre>${validation}</td><td><pre id="${preId}_shortlink" class="border p-2 shortlink_display overflow-scroll w-100 text-dark bg-body"><code class="user-select-all"></code></pre><button type="submit" class="btn btn-secondary btn generate_shorlink" aria-label="Generate short link d-block my-1" data-for="${preId}"><i class="bi-link"></i> Get short link</button></div></td></tr></tbody>`
 				);
 
 				// fill in generated UTM
@@ -293,7 +346,9 @@ $(document).ready(function () {
 				group_guid: config.group_guid,
 			};
 
-		$btn.find("i").addClass("bi-arrow-clockwise spin").removeClass("bi-link");
+		$btn.find("i")
+			.addClass("bi-arrow-clockwise spin")
+			.removeClass("bi-link");
 
 		// @TODO: select group/domain based on domain
 		if (url.hostname == "tcf.org.pk") {
@@ -309,7 +364,9 @@ $(document).ready(function () {
 			body: JSON.stringify(dataObject),
 		})
 			.then((response) => {
-				$btn.find("i").removeClass("bi-arrow-clockwise spin").addClass("bi-link");
+				$btn.find("i")
+					.removeClass("bi-arrow-clockwise spin")
+					.addClass("bi-link");
 
 				if (response.ok) {
 					return response.json();
