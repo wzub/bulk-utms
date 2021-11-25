@@ -21,3 +21,16 @@ pre {
 th {
 	text-transform: capitalize;
 }
+
+.spin::before {
+	animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(359deg);
+    }
+}

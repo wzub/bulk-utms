@@ -7,14 +7,18 @@ $(document).ready(function () {
 		utm_medium = $("#utm_medium"),
 		utm_campaign = $("#utm_campaign"),
 		utm_content = $("#utm_content"),
-		utm_form = $("form#utm_form");
+		utm_form = $("form#utm_form"),
+		utm_table_container = $("#utm_table_container"),
+		btn_download = $("#download_csv");
+
+	btn_download.hide();
 
 	btn_generate.on("click", function (e) {
 		try {
 			e.preventDefault();
 
 			// clear previous
-			$("#utm_table_container").html(
+			utm_table_container.html(
 				"<p>Click <code>Generate</code> above to build a list of URLs.</p>"
 			);
 
@@ -55,12 +59,13 @@ $(document).ready(function () {
 			}
 
 			create_utm(url, get_params(), get_selected_sites());
+			btn_download.show();
 		} catch (e) {
 			console.log(e);
 		}
 	});
 
-	btn_clear.click(function () {
+	btn_clear.on("click", function () {
 		utm_form.trigger("reset");
 		utm_url_display.text("");
 		btn_copy.hide();
@@ -74,6 +79,55 @@ $(document).ready(function () {
 	utm_custom_params.on("hidden.bs.collapse", function () {
 		utm_source.attr("required", false);
 	});
+
+	btn_download.on("click", function () {
+		let utm_table = $("table.utm_table");
+		download_table_as_csv(utm_table);
+	});
+
+	// @Calumah via https://stackoverflow.com/questions/15547198/export-html-table-to-csv-using-vanilla-javascript
+	function download_table_as_csv(table) {
+		let rows = table.find("tr"),
+			csv = [];
+
+		// loop through all tr
+		for (var i = 0; i < rows.length; i++) {
+			// for each row get source and links inside pre
+			let row = [],
+				cols = rows[i].querySelectorAll("th, td pre");
+
+			// loop through columns
+			for (var j = 0; j < cols.length; j++) {
+				// get and clean text of each th, td pre
+				// remove multiple spaces and jumpline (break csv)
+				// Escape double-quote with double-double-quote (see https://stackoverflow.com/questions/17808511/properly-escape-a-double-quote-in-csv)
+				let data = cols[j].innerText
+					.replace(/(\r\n|\n|\r)/gm, "")
+					.replace(/(\s\s)/gm, " ")
+					.replace(/"/g, '""');
+
+				row.push('"' + data + '"');
+			}
+			csv.push(row.join(","));
+		}
+
+		// convert csv to a set and back again to remove duplicate table headers
+		let csv_deduped = Array.from(new Set(csv)),
+			csv_string = csv_deduped.join("\n"),
+			filename = "utms_" + new Date().toLocaleDateString() + ".csv",
+			link = document.createElement("a");
+
+		link.style.display = "none";
+		link.setAttribute("target", "_blank");
+		link.setAttribute(
+			"href",
+			"data:text/csv;charset=utf-8," + encodeURIComponent(csv_string)
+		);
+		link.setAttribute("download", filename);
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
 
 	/*
 	copy.on("success", function () {
@@ -218,9 +272,6 @@ $(document).ready(function () {
 	}
 
 	function display_utms(utms, params) {
-		let utm_table_container = $("#utm_table_container"),
-			utm_table = $("#utm_table");
-
 		utm_table_container.html("");
 
 		for (let site of Object.values(utms)) {
@@ -231,14 +282,14 @@ $(document).ready(function () {
 						"aria-labelledby": site_html_id + "_title",
 					})
 					.addClass(
-						"table table-responsive table-hover caption-top align-middle mb-4 mw-100"
+						"table table-responsive table-hover caption-top align-top mb-4 mw-100 utm_table"
 					)
 					.appendTo(utm_table_container);
 
 			// create thead
 			site_table
 				.append(
-					'<caption>Links for <span class="utm_url"></span></caption><thead class="table-dark"><tr><th scope="col" class="col-md-2">Source</th><th scope="col" class="col-md-10">UTM link</th></tr></thead>'
+					'<caption>Links for <span class="utm_url"></span></caption><thead class="table-dark"><tr><th scope="col" class="col-md-2">Source</th><th scope="col" class="col-md-8">UTM link</th><th scope="col" class="col-md-2">Short link</th></tr></thead>'
 				)
 				.before(
 					`<hr class='my-4' /><h3 id="${site_html_id}_title">${site.hostname}</h3>`
@@ -264,13 +315,71 @@ $(document).ready(function () {
 
 				// create tbody
 				site_table.append(
-					`<tbody><tr><th scope="row"><i class="bi ${values.icon} me-1" title="${source}"></i>${values.utm_source}</th><td><div class="input-group"><pre id="${preId}" class="user-select-all border p-2 utm_display overflow-scroll w-100 text-dark bg-body"><code></code></pre></div>${validation}</td></tr></tbody>`
+					`<tbody><tr><th scope="row" class="p-md-3"><i class="bi ${values.icon} me-1" title="${source}"></i>${values.utm_source}</th><td><pre id="${preId}" class="border p-2 utm_display overflow-scroll w-100 text-dark bg-body"><code class="user-select-all"></code></pre>${validation}</td><td><pre id="${preId}_shortlink" class="border p-2 shortlink_display overflow-scroll w-100 text-dark bg-body"><code class="user-select-all"></code></pre><button type="submit" class="btn btn-secondary btn generate_shorlink" aria-label="Generate short link d-block my-1" data-for="${preId}"><i class="bi-link"></i> Get short link</button></div></td></tr></tbody>`
 				);
 
 				// fill in generated UTM
 				$(`pre#${preId} > code`).text(site[source].href);
 			}
 		}
+	}
+
+	utm_table_container.on("click", ".generate_shorlink", function (e) {
+		e.preventDefault();
+		shortenUrl(this);
+	});
+
+	function shortenUrl(btn) {
+		const config = {
+			token: BITLY_TOKEN, // Netlify env variable
+			group_guid: "",
+		};
+
+		let $btn = $(btn),
+			shortlink_for = $btn.attr("data-for"),
+			url_display = $(`pre#${shortlink_for} > code`),
+			url = new URL(url_display.text()),
+			dataObject = {
+				long_url: url,
+				domain: "bit.ly",
+				tags: ["bulk-utm-builder", "api"],
+				group_guid: config.group_guid,
+			};
+
+		$btn.find("i")
+			.addClass("bi-arrow-clockwise spin")
+			.removeClass("bi-link");
+
+		// @TODO: select group/domain based on domain
+		if (url.hostname == "tcf.org.pk") {
+			dataObject.domain = "link.tcf.org.pk";
+		}
+
+		fetch("https://api-ssl.bitly.com/v4/shorten", {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${config.token}`,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(dataObject),
+		})
+			.then((response) => {
+				$btn.find("i")
+					.removeClass("bi-arrow-clockwise spin")
+					.addClass("bi-link");
+
+				if (response.ok) {
+					return response.json();
+				} else {
+					return Promise.reject(response.status);
+				}
+			})
+			.then((json) => {
+				$(`pre#${shortlink_for}_shortlink code`).text(json.link);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	}
 
 	function validate_utm(url) {
