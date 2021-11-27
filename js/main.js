@@ -1,7 +1,6 @@
 $(document).ready(function () {
 	const btn_clear = $("#clear_form"),
 		btn_generate = $("#generate_url"),
-		utm_url = $("#utm_url"),
 		utm_custom_params = $("#utm_custom_params"),
 		utm_source = $("#utm_source"),
 		utm_medium = $("#utm_medium"),
@@ -9,18 +8,16 @@ $(document).ready(function () {
 		utm_content = $("#utm_content"),
 		utm_form = $("form#utm_form"),
 		utm_table_container = $("#utm_table_container"),
-		btn_download = $("#download_csv");
-
-	btn_download.hide();
+		btn_download = $("#download_csv"),
+		form_edited_notice = $("#form_edited_notice").remove(),
+		default_notice = $("#default_notice");
 
 	btn_generate.on("click", function (e) {
 		try {
 			e.preventDefault();
 
-			// clear previous
-			utm_table_container.html(
-				"<p>Click <code>Generate</code> above to build a list of URLs.</p>"
-			);
+			// clear previous stuff from the table
+			cleanup();
 
 			// can't use jQuery obj for reportValidity
 			if (!document.querySelector("#utm_form").reportValidity()) {
@@ -29,7 +26,6 @@ $(document).ready(function () {
 			}
 
 			utm_form.addClass("was-validated");
-			console.log("valid input");
 
 			let url = $("#utm_url_input").val().trim();
 
@@ -59,16 +55,11 @@ $(document).ready(function () {
 			}
 
 			create_utm(url, get_params(), get_selected_sites());
-			btn_download.show();
+			
+			btn_download.removeClass("d-none");
 		} catch (e) {
 			console.log(e);
 		}
-	});
-
-	btn_clear.on("click", function () {
-		utm_form.trigger("reset");
-		utm_url_display.text("");
-		btn_copy.hide();
 	});
 
 	// set utm_source to required if custom is shown
@@ -83,6 +74,39 @@ $(document).ready(function () {
 	btn_download.on("click", function () {
 		let utm_table = $("table.utm_table");
 		download_table_as_csv(utm_table);
+	});
+
+	btn_clear.on("click", () => cleanup(true));
+
+	utm_form.on("change", function() {
+		this.classList.add("form_edited");
+		utm_table_container.prepend(form_edited_notice);
+	});
+
+	// add listener to container because copy buttons are dynamic
+	utm_table_container.on("click", ".copy-url", function () {
+		let btn_icon = this.querySelector("i"),
+			btn_text = this.querySelector("span"),
+			url_container = utm_table_container.find(`#${this.dataset.for}`);
+
+		navigator.clipboard
+			.writeText(url_container.text())
+			.then(() => {
+				btn_text.textContent = "Copied!";
+				btn_icon.classList.replace("bi-clipboard-plus", "bi-clipboard-check");
+				
+				setTimeout(() => {
+					btn_text.textContent = "Copy";
+					btn_icon.classList.replace("bi-clipboard-check", "bi-clipboard-plus");
+				}, 1000);
+
+				console.log(`Copied ${url_container.text()}`);
+			})
+			.catch((err) => {
+				console.log("Couldn't copy", err);
+			});
+		
+		url_container.trigger("click");
 	});
 
 	// @Calumah via https://stackoverflow.com/questions/15547198/export-html-table-to-csv-using-vanilla-javascript
@@ -129,19 +153,18 @@ $(document).ready(function () {
 		document.body.removeChild(link);
 	}
 
-	/*
-	copy.on("success", function () {
-		btn_copy.find("i").attr("class", "bi-clipboard-check");
-		setTimeout(() => {
-			btn_copy.find("i").attr("class", "bi-clipboard-plus");
-		}, 1000);
-	});
-	*/
-
 	// trim and lowercase utm parameters
 	// more complex serialization is handled by URL API
 	function clean_param(param) {
 		return param.val().toLowerCase().trim();
+	}
+
+	function cleanup(clearForm = false) {
+		if (clearForm) utm_form.trigger("reset").removeClass("was-validated");
+
+		btn_download.addClass("d-none");
+		utm_table_container.html(default_notice);
+		utm_form.removeClass("form_edited");
 	}
 
 	function get_params() {
@@ -287,9 +310,17 @@ $(document).ready(function () {
 					.appendTo(utm_table_container);
 
 			// create thead
+			// prettier-ignore
 			site_table
 				.append(
-					'<caption>Links for <span class="utm_url"></span></caption><thead class="table-dark"><tr><th scope="col" class="col-md-2">Source</th><th scope="col" class="col-md-8">UTM link</th><th scope="col" class="col-md-2">Short link</th></tr></thead>'
+					`<caption>Links for <span class="utm_url"></span></caption>
+					<thead class="table-dark">
+						<tr>
+							<th scope="col" class="col-md-2">Source</th>
+							<th scope="col" class="col-md-7">UTM link</th>
+							<th scope="col" class="col-md-3">Short link</th>
+						</tr>
+					</thead>`
 				)
 				.before(
 					`<hr class='my-4' /><h3 id="${site_html_id}_title">${site.hostname}</h3>`
@@ -308,18 +339,32 @@ $(document).ready(function () {
 
 				// html friendly ID without .
 				// pre#tcf_org_pk_utm_facebook
-				let preId = `${site_html_id}_${source}`;
-
 				// validate generated URL
-				let validation = validate_utm(site[source]);
+				let preId = `${site_html_id}_${source}`,
+					validation = validate_utm(site[source]);
 
 				// create tbody
+				// prettier-ignore
 				site_table.append(
-					`<tbody><tr><th scope="row" class="p-md-3"><i class="bi ${values.icon} me-1" title="${source}"></i>${values.utm_source}</th><td><pre id="${preId}" class="border p-2 utm_display overflow-scroll w-100 text-dark bg-body"><code class="user-select-all"></code></pre>${validation}</td><td><pre id="${preId}_shortlink" class="border p-2 shortlink_display overflow-scroll w-100 text-dark bg-body"><code class="user-select-all"></code></pre><button type="submit" class="btn btn-secondary btn generate_shorlink" aria-label="Generate short link d-block my-1" data-for="${preId}"><i class="bi-link"></i> Get short link</button></div></td></tr></tbody>`
+					`<tbody>
+					<tr>
+						<th scope="row" class="p-md-3 text-capitalize"><i class="bi ${values.icon} me-1" title="${source}"></i>${values.utm_source}</th>
+						<td class="position-relative">
+							<pre id="${preId}" class="border p-2 utm_display text-dark bg-body text-break mb-1"><code class="user-select-all">${site[source].href}</code></pre>
+							<button type="button" class="btn btn-outline-secondary copy-url col-auto" data-for="${preId}" title="Copy full URL"><i class="bi-clipboard-plus"></i> <span>Copy</span></button>
+							${validation}
+						</td>
+						<td>
+							<pre id="${preId}_shortlink" class="border p-2 shortlink_display text-dark bg-body text-break mb-1"><code class="user-select-all"></code></pre>
+							<div class="btn-group" role="group">
+								<button type="submit" class="btn btn-outline-secondary generate_shorlink col-auto ms-auto" aria-label="Generate short link" data-for="${preId}" title="Make short link"><i class="bi-lightning-charge-fill"></i> Make</button>
+								<button type="button" class="btn btn-outline-secondary copy-url col-auto" data-for="${preId}_shortlink" title="Copy shortlink"><i class="bi-clipboard-plus"></i> <span>Copy</span></button>
+							</div>
+						</td>
+					</tr>
+					</tbody>`
 				);
 
-				// fill in generated UTM
-				$(`pre#${preId} > code`).text(site[source].href);
 			}
 		}
 	}
@@ -347,7 +392,7 @@ $(document).ready(function () {
 			};
 
 		$btn.find("i")
-			.addClass("bi-arrow-clockwise spin")
+			.addClass("spinner-border spinner-border-sm")
 			.removeClass("bi-link");
 
 		// @TODO: select group/domain based on domain
@@ -365,7 +410,7 @@ $(document).ready(function () {
 		})
 			.then((response) => {
 				$btn.find("i")
-					.removeClass("bi-arrow-clockwise spin")
+					.removeClass("spinner-border spinner-border-sm")
 					.addClass("bi-link");
 
 				if (response.ok) {
@@ -402,10 +447,13 @@ $(document).ready(function () {
 			validate_message.push("<strong>utm_content</strong>");
 		}
 
+		// prettier-ignore
 		if (validate_message.length) {
-			return `<div class="alert alert-warning d-flex align-items-top my-1" role="alert"><i class="bi bi-info-circle-fill me-3"></i><div>Consider adding ${validate_message.join(
-				", "
-			)}</div></div>`;
+			return `
+				<div class="alert alert-warning d-flex align-items-top my-1" role="alert">
+					<i class="bi bi-info-circle-fill me-3"></i>
+					<div>Consider adding ${validate_message.join(", ")}</div>
+				</div>`;
 		}
 
 		return "";
