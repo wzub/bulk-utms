@@ -19,20 +19,25 @@
 	</head>
 
 	<body>
-		<div class="container-md mt-3">
-			<div class="p-md-5 p-3">
+		<div class="container-md pt-3">
+			<div class="pt-md-5">
 				<h1 class="display-1">TCF's UTM Builder</h1>
 				<p class="lead">
 					Here's a simple utility to help generate UTM links en masse.
 				</p>
+
+				<span id="name_container"></span>
+				<div class="d-inline" data-netlify-identity-button></div>
 			</div>
+			<hr class="my-2" />
 		</div>
 
+
 		<div id="login_container" class="logged-out container-md my-3 d-flex align-items-center justify-content-center border bg-light p-5">
-			<div data-netlify-identity-button></div>
+			<svg xmlns='http://www.w3.org/2000/svg' width='46' height='46' fill='lightgray' class='bi bi-table d-block' viewBox='0 0 16 16'><path d='M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 2h-4v3h4V4zm0 4h-4v3h4V8zm0 4h-4v3h3a1 1 0 0 0 1-1v-2zm-5 3v-3H6v3h4zm-5 0v-3H1v2a1 1 0 0 0 1 1h3zm-4-4h4V8H1v3zm0-4h4V4H1v3zm5-3v3h4V4H6zm4 4H6v3h4V8z'/></svg>
 		</div>
 		
-		<div id="utm_container" class="logged-in container-md my-5 visually-hidden">
+		<div id="utm_container" class="logged-in container-md my-md-3 visually-hidden">
 			<form id="utm_form" class="needs-validation" >
 				<h3>URL details</h3>
 				<div class="row mb-3 url form-section">
@@ -142,146 +147,144 @@
 					<h3>UTM Parameters</h3>
 
 					<div class="row mb-3">
-						<div class="row mb-3">
-							<label
-								for="utm_campaign"
-								class="col-md-3 col-form-label"
-								>utm_campaign</label
+						<label
+							for="utm_campaign"
+							class="col-md-3 col-form-label"
+							>utm_campaign</label
+						>
+						<div class="col-md-9">
+							<input
+								id="utm_campaign"
+								type="text"
+								class="form-control form-control utm_param"
+								pattern="[a-z][A-z-\d\s]+"
+							/>
+							<small class="text-muted form-text"
+								>A cross-channel description of the campaign or marketing initiative: (e.g.
+								<code>ramzan2021</code>,
+								<code>members</code>,
+								<code>expiry</code>)</small
 							>
-							<div class="col-md-9">
-								<input
-									id="utm_campaign"
-									type="text"
-									class="form-control form-control utm_param"
-									pattern="[a-z][A-z-\d\s]+"
-								/>
-								<small class="text-muted form-text"
-									>A cross-channel description of the campaign or marketing initiative: (e.g.
-									<code>ramzan2021</code>,
-									<code>members</code>,
-									<code>expiry</code>)</small
-								>
-							</div>
 						</div>
-						<div class="row mb-3">
+					</div>
+					<div class="row mb-3">
+						<label
+							for="utm_content"
+							class="col-md-3 col-form-label"
+							>utm_content</label
+						>
+						<div class="col-md-9">
+							<input
+								id="utm_content"
+								type="text"
+								class="form-control form-control utm_param"
+								pattern="[a-z][A-z-\d\s]+"
+							/>
+							<small class="text-muted form-text"
+								>To differentiate ads or posts (e.g.
+								<code>membership-launch</code>,
+								<code>dvc30s</code>)</small
+							>
+						</div>
+					</div>
+					<div class="row mb-3">
+						<label
+							for="utm_term"
+							class="col-md-3 col-form-label"
+							>utm_term <span class="text-muted">(optional)</span></label
+						>
+						<div class="col-md-9">
+							<input
+								id="utm_term"
+								type="text"
+								class="form-control form-control utm_param"
+								pattern="[a-z][A-z-\d\s]+"
+							/>
+							<small class="text-muted form-text"
+								>Used for paid search, to identify the keywords for this ad. (e.g.
+								<code>donate for education</code>,
+								<code>zakat calculator</code>)</small
+							>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-3">
 							<label
 								for="utm_content"
-								class="col-md-3 col-form-label"
-								>utm_content</label
+								class="col-form-label"
+								>Common presets</label
 							>
-							<div class="col-md-9">
-								<input
-									id="utm_content"
-									type="text"
-									class="form-control form-control utm_param"
-									pattern="[a-z][A-z-\d\s]+"
-								/>
-								<small class="text-muted form-text"
-									>To differentiate ads or posts (e.g.
-									<code>membership-launch</code>,
-									<code>dvc30s</code>)</small
-								>
-							</div>
 						</div>
-						<div class="row mb-3">
-							<label
-								for="utm_term"
-								class="col-md-3 col-form-label"
-								>utm_term <span class="text-muted">(optional)</span></label
-							>
-							<div class="col-md-9">
+						<div class="col-md-9">
+							<div class="selected_sources" role="group" aria-label="Sites">
 								<input
-									id="utm_term"
-									type="text"
-									class="form-control form-control utm_param"
-									pattern="[a-z][A-z-\d\s]+"
+									type="checkbox"
+									class="btn-check sources"
+									id="utm_facebook"
+									value="utm_facebook"
+									checked
 								/>
-								<small class="text-muted form-text"
-									>Used for paid search, to identify the keywords for this ad. (e.g.
-									<code>donate for education</code>,
-									<code>zakat calculator</code>)</small
+								<label class="btn btn-outline-primary" for="utm_facebook"
+									>Facebook</label
 								>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-3">
-								<label
-									for="utm_content"
-									class="col-form-label"
-									>Common presets</label
+								<input
+									type="checkbox"
+									class="btn-check sources"
+									id="utm_twitter"
+									value="utm_twitter"
+								/>
+								<label class="btn btn-outline-primary" for="utm_twitter"
+									>Twitter</label
 								>
-							</div>
-							<div class="col-md-9">
-								<div class="selected_sources" role="group" aria-label="Sites">
-									<input
-										type="checkbox"
-										class="btn-check sources"
-										id="utm_facebook"
-										value="utm_facebook"
-										checked
-									/>
-									<label class="btn btn-outline-primary" for="utm_facebook"
-										>Facebook</label
-									>
-									<input
-										type="checkbox"
-										class="btn-check sources"
-										id="utm_twitter"
-										value="utm_twitter"
-									/>
-									<label class="btn btn-outline-primary" for="utm_twitter"
-										>Twitter</label
-									>
-									<input
-										type="checkbox"
-										class="btn-check sources"
-										id="utm_linkedin"
-										value="utm_linkedin"
-									/>
-									<label class="btn btn-outline-primary" for="utm_linkedin"
-										>LinkedIn</label
-									>
-									<input
-										type="checkbox"
-										class="btn-check sources"
-										id="utm_instagram"
-										value="utm_instagram"
-									/>
-									<label class="btn btn-outline-primary" for="utm_instagram"
-										>Instagram</label
-									>
-									<input
-										type="checkbox"
-										class="btn-check sources"
-										id="utm_email"
-										value="utm_email"
-									/>
-									<label class="btn btn-outline-primary" for="utm_email"
-										>Email</label
-									>
-									<input
-										type="checkbox"
-										class="btn-check sources"
-										id="utm_whatsapp"
-										value="utm_whatsapp"
-									/>
-									<label class="btn btn-outline-primary" for="utm_whatsapp"
-										>WhatsApp</label
-									>
-									<input
-										type="checkbox"
-										class="btn-check sources"
-										id="utm_custom"
-										value="utm_custom"
-										data-bs-toggle="collapse"
-										data-bs-target="#utm_custom_params"
-										aria-expanded="false"
-										aria-controls="utm_custom_params"
-									/>
-									<label class="btn btn-outline-primary" for="utm_custom"
-										>Custom</label
-									>
-								</div>
+								<input
+									type="checkbox"
+									class="btn-check sources"
+									id="utm_linkedin"
+									value="utm_linkedin"
+								/>
+								<label class="btn btn-outline-primary" for="utm_linkedin"
+									>LinkedIn</label
+								>
+								<input
+									type="checkbox"
+									class="btn-check sources"
+									id="utm_instagram"
+									value="utm_instagram"
+								/>
+								<label class="btn btn-outline-primary" for="utm_instagram"
+									>Instagram</label
+								>
+								<input
+									type="checkbox"
+									class="btn-check sources"
+									id="utm_email"
+									value="utm_email"
+								/>
+								<label class="btn btn-outline-primary" for="utm_email"
+									>Email</label
+								>
+								<input
+									type="checkbox"
+									class="btn-check sources"
+									id="utm_whatsapp"
+									value="utm_whatsapp"
+								/>
+								<label class="btn btn-outline-primary" for="utm_whatsapp"
+									>WhatsApp</label
+								>
+								<input
+									type="checkbox"
+									class="btn-check sources"
+									id="utm_custom"
+									value="utm_custom"
+									data-bs-toggle="collapse"
+									data-bs-target="#utm_custom_params"
+									aria-expanded="false"
+									aria-controls="utm_custom_params"
+								/>
+								<label class="btn btn-outline-primary" for="utm_custom"
+									>Custom</label
+								>
 							</div>
 						</div>
 					</div>

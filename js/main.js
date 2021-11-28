@@ -10,7 +10,8 @@ $(document).ready(function () {
 		utm_table_container = $("#utm_table_container"),
 		btn_download = $("#download_csv"),
 		form_edited_notice = $("#form_edited_notice").remove(),
-		default_notice = $("#default_notice");
+		default_notice = $("#default_notice"),
+		user = netlifyIdentity.currentUser();
 
 	btn_generate.on("click", function (e) {
 		try {
@@ -375,6 +376,13 @@ $(document).ready(function () {
 	});
 
 	function shortenUrl(btn) {
+		if (!user) {
+			console.log("Not logged in");
+			return;
+		}
+
+		console.log(`Logged in as ${user.email}`);
+
 		const config = {
 			token: BITLY_TOKEN, // Netlify env variable
 			group_guid: "",
@@ -393,7 +401,7 @@ $(document).ready(function () {
 
 		$btn.find("i")
 			.addClass("spinner-border spinner-border-sm")
-			.removeClass("bi-link");
+			.removeClass("bi-lightning-charge-fill");
 
 		// @TODO: select group/domain based on domain
 		if (url.hostname == "tcf.org.pk") {
@@ -411,7 +419,7 @@ $(document).ready(function () {
 			.then((response) => {
 				$btn.find("i")
 					.removeClass("spinner-border spinner-border-sm")
-					.addClass("bi-link");
+					.addClass("bi-lightning-charge-fill");
 
 				if (response.ok) {
 					return response.json();
